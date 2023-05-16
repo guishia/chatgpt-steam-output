@@ -6,6 +6,7 @@ import com.unfbx.chatgpt.exception.CommonError;
 import com.unfbx.chatgptsteamoutput.controller.request.ChatRequest;
 import com.unfbx.chatgptsteamoutput.controller.response.ChatResponse;
 import com.unfbx.chatgptsteamoutput.service.SseService;
+import com.unfbx.chatgptsteamoutput.until.prompt4Translation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +55,8 @@ public class ChatController {
     @ResponseBody
     public ChatResponse sseChat(@RequestBody ChatRequest chatRequest, @RequestHeader Map<String, String> headers, HttpServletResponse response) {
         String uid = getUid(headers);
+        //只有聊天的输入信息，没有结果
+        prompt4Translation prompt4Translation = new prompt4Translation("中文","Franch");
         return sseService.sseChat(uid, chatRequest);
     }
 

@@ -39,14 +39,14 @@ public class OpenAISSEEventSourceListener extends EventSourceListener {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc}发送数据
      */
     @SneakyThrows
     @Override
     public void onEvent(EventSource eventSource, String id, String type, String data) {
-        log.info("OpenAI返回数据：{}", data);
+        log.info("OpenAI返回数据：{}", data); //不断地调用该方法，每次接收一个单词，如果是汉字的话，每次接收一个汉字，实际上是tokens
         tokens += 1;
-        if (data.equals("[DONE]")) {
+        if (data.equals("[DONE]")) { //传回来的数据DONE作为结束符
             log.info("OpenAI返回数据结束了");
             sseEmitter.send(SseEmitter.event()
                     .id("[TOKENS]")
@@ -61,7 +61,10 @@ public class OpenAISSEEventSourceListener extends EventSourceListener {
             return;
         }
         ObjectMapper mapper = new ObjectMapper();
-        ChatCompletionResponse completionResponse = mapper.readValue(data, ChatCompletionResponse.class); // 读取Json
+        //这里读取Openai传过来的json然后对它进行读取
+        ChatCompletionResponse completionResponse = mapper.readValue(data, ChatCompletionResponse.class); // 读取Json，第一个参数表示只用读取Data数据，而该对象的ID是自增的
+        //然后发送到客户端浏览器
+        //System.out.println("在这里"+completionResponse.getChoices().get(0).getDelta().getContent());//这里是获得每一个字，那么我们把每个字连起来就可以了
         try {
             sseEmitter.send(SseEmitter.event()
                     .id(completionResponse.getId())

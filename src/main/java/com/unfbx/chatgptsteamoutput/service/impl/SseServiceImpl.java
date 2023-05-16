@@ -36,6 +36,7 @@ public class SseServiceImpl implements SseService {
         this.openAiStreamClient = openAiStreamClient;
     }
 
+    //创建SSE连接，将连接保存在缓存中
     @Override
     public SseEmitter createSse(String uid) {
         //默认30秒超时,设置为0L则永不超时
@@ -94,31 +95,40 @@ public class SseServiceImpl implements SseService {
         String messageContext = (String) LocalCache.CACHE.get("msg" + uid);
         List<Message> messages = new ArrayList<>();
         if (StrUtil.isNotBlank(messageContext)) {
+            //从Json中获取gpt传回来的信息
             messages = JSONUtil.toList(messageContext, Message.class);
+            //对缓存池进行裁剪
             if (messages.size() >= 10) {
                 messages = messages.subList(1, 10);
             }
+            //这里是获取用户的输入
             Message currentMessage = Message.builder().content(chatRequest.getMsg()).role(Message.Role.USER).build();
             messages.add(currentMessage);
         } else {
             Message currentMessage = Message.builder().content(chatRequest.getMsg()).role(Message.Role.USER).build();
             messages.add(currentMessage);
         }
-
+        //缓存池中有不同的对象，共用一个缓存池
         SseEmitter sseEmitter = (SseEmitter) LocalCache.CACHE.get(uid);
-
+        //这是保证数据发送到对应的用户前段
         if (sseEmitter == null) {
             log.info("聊天消息推送失败uid:[{}],没有创建连接，请重试。", uid);
             throw new BaseException("聊天消息推送失败uid:[{}],没有创建连接，请重试。~");
         }
         OpenAISSEEventSourceListener openAIEventSourceListener = new OpenAISSEEventSourceListener(sseEmitter);
+        //completion该对象中只有用户信息
         ChatCompletion completion = ChatCompletion
                 .builder()
                 .messages(messages)
                 .model(ChatCompletion.Model.GPT_3_5_TURBO.getName())
                 .build();
+        //这里也是从包引入的，这里才对chatgpt进行调用了
+        //System.out.println("看哦看我"+messages);
         openAiStreamClient.streamChatCompletion(completion, openAIEventSourceListener);
+        //所以这一步我们可以确定它对messages进行处理了
+        //只保存了用户信息，我们可以让它保存gpt输出的信息
         LocalCache.CACHE.put("msg" + uid, JSONUtil.toJsonStr(messages), LocalCache.TIMEOUT);
+        //System.out.println("看哦看我"+messages);
         ChatResponse response = new ChatResponse();
         response.setQuestionTokens(completion.tokens());
         return response;
