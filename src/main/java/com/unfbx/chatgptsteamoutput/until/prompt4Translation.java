@@ -13,7 +13,6 @@ public class prompt4Translation implements prompt {
           this.sourceLanguage+=sourceLanguage;
           this.targetLanguage+=targetLanguage;
     }
-
     @Override
     public String getPrompt() {
         return prompt;
