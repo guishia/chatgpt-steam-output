@@ -1,6 +1,6 @@
-package com.unfbx.chatgptsteamoutput.until;
+package com.unfbx.chatgptsteamoutput.until.promptUntil;
 
-public interface prompt {
+public interface Prompt {
     String prompt = null;
 
     public default String getPrompt(){

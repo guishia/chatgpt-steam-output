@@ -59,5 +59,4 @@ public class ChatgptSteamOutputApplication {
                 .okHttpClient(okHttpClient)
                 .build();
     }
-
 }
