@@ -1,5 +1,8 @@
 package com.unfbx.chatgptsteamoutput.until.promptUntil;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Prompt4Translation implements Prompt {
     String sourceLanguage="";
     String targetLanguage="";

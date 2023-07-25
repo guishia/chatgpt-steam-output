@@ -1,8 +1,11 @@
 package com.unfbx.chatgptsteamoutput.until.promptUntil;
 
+import org.springframework.stereotype.Component;
+
 /*
     仿LangChain的简陋版SQL prompt
  */
+@Component
 public class Prompt4SQL implements Prompt {
     int top_k=4;
     //可以用的表
