@@ -24,6 +24,7 @@ public class OpenAISSEEventSourceListener extends EventSourceListener {
 
     private long tokens;
 
+    private StringBuilder GPTResponse = new StringBuilder();
     private SseEmitter sseEmitter;
 
     public OpenAISSEEventSourceListener(SseEmitter sseEmitter) {
@@ -64,12 +65,15 @@ public class OpenAISSEEventSourceListener extends EventSourceListener {
         //这里读取Openai传过来的json然后对它进行读取
         ChatCompletionResponse completionResponse = mapper.readValue(data, ChatCompletionResponse.class); // 读取Json，第一个参数表示只用读取Data数据，而该对象的ID是自增的
         //然后发送到客户端浏览器
-        //System.out.println("在这里"+completionResponse.getChoices().get(0).getDelta().getContent());//这里是获得每一个字，那么我们把每个字连起来就可以了
+        //通过这种方式把消息传回前端
         try {
             sseEmitter.send(SseEmitter.event()
                     .id(completionResponse.getId())
                     .data(completionResponse.getChoices().get(0).getDelta())
                     .reconnectTime(3000));
+            //获取GPT回复的文字
+            if (completionResponse.getChoices().get(0).getDelta().getContent() != null)
+                GPTResponse.append(completionResponse.getChoices().get(0).getDelta().getContent());
         } catch (Exception e) {
             log.error("sse信息推送失败！");
             eventSource.cancel();
@@ -102,6 +106,7 @@ public class OpenAISSEEventSourceListener extends EventSourceListener {
 
     /**
      * tokens
+     *
      * @return
      */
     public long tokens() {

@@ -3,12 +3,16 @@ package com.unfbx.chatgptsteamoutput;
 import com.unfbx.chatgpt.OpenAiStreamClient;
 import com.unfbx.chatgpt.function.KeyRandomStrategy;
 import com.unfbx.chatgpt.interceptor.OpenAILogger;
+import com.unfbx.chatgptsteamoutput.until.promptUntil.Prompt;
+import com.unfbx.chatgptsteamoutput.until.promptUntil.Prompt4SQL;
+import com.unfbx.chatgptsteamoutput.until.promptUntil.Prompt4Translation;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;

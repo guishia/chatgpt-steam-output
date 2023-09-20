@@ -101,8 +101,10 @@ public class SseServiceImpl implements SseService {
             if (messages.size() >= 10) {
                 messages = messages.subList(1, 10);
             }
-            //这里是获取用户的输入
+            //这里是获取用户的输入，我们要设置任何的请求参数都在这里设置
+            Message promptMessage = Message.builder().content(chatRequest.getPrompt()).role(Message.Role.SYSTEM).build();
             Message currentMessage = Message.builder().content(chatRequest.getMsg()).role(Message.Role.USER).build();
+            if(promptMessage.getContent()!=null) messages.add(promptMessage);
             messages.add(currentMessage);
         } else {
             Message currentMessage = Message.builder().content(chatRequest.getMsg()).role(Message.Role.USER).build();
@@ -123,12 +125,10 @@ public class SseServiceImpl implements SseService {
                 .model(ChatCompletion.Model.GPT_3_5_TURBO.getName())
                 .build();
         //这里也是从包引入的，这里才对chatgpt进行调用了
-        //System.out.println("看哦看我"+messages);
         openAiStreamClient.streamChatCompletion(completion, openAIEventSourceListener);
         //所以这一步我们可以确定它对messages进行处理了
         //只保存了用户信息，我们可以让它保存gpt输出的信息
         LocalCache.CACHE.put("msg" + uid, JSONUtil.toJsonStr(messages), LocalCache.TIMEOUT);
-        //System.out.println("看哦看我"+messages);
         ChatResponse response = new ChatResponse();
         response.setQuestionTokens(completion.tokens());
         return response;

@@ -1,10 +1,14 @@
-package com.unfbx.chatgptsteamoutput.until;
+package com.unfbx.chatgptsteamoutput.until.promptUntil;
+
+import org.springframework.stereotype.Component;
 
 /*
     仿LangChain的简陋版SQL prompt
  */
-public class prompt4SQL implements prompt{
+@Component
+public class Prompt4SQL implements Prompt {
     int top_k=4;
+    //可以用的表
     String tableInfo="user";
     String  prompt= "You are a MySQL expert. Given an input question, first create a syntactically correct MySQL query to run, then look at the results of the query and return the answer to the input question.\n" +
             "Unless the user specifies in the question a specific number of examples to obtain, query for at most"+top_k+"results using the LIMIT clause as per MySQL. You can order the results to return the most informative data in the database.\n" +
@@ -19,9 +23,13 @@ public class prompt4SQL implements prompt{
              tableInfo+"\n\n" +
             "Question: ";
 
-    public prompt4SQL(int top_k, String tableInfo) {
+    public Prompt4SQL(int top_k, String tableInfo) {
         this.top_k = top_k;
         this.tableInfo = tableInfo;
+    }
+
+    public Prompt4SQL() {
+
     }
 
     @Override
