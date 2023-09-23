@@ -1,4 +1,4 @@
-package com.unfbx.chatgptsteamoutput.until.openAIRequstUntil;
+package com.unfbx.chatgptsteamoutput.until.OpenAIRequstUntil;
 
 
 import java.io.IOException;
@@ -16,12 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.unfbx.chatgptsteamoutput.until.promptUntil.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
 public class OpenAIRequest {
-    private String apiKey = "Bearer ";
+    private String apiKey = "Bearer "; //这里应该通过依赖注入的方式注入
     private String apiHost = "https://api.openai.com/v1/chat/completions";
 
     private String model = "gpt-3.5-turbo-0301"; //GPT版本信息，就用3.5吧
@@ -30,9 +26,12 @@ public class OpenAIRequest {
     private String result;
 
     public OpenAIRequest(String prompt, String userMessage) throws IOException {
-        this.prompt=prompt;
+        this.prompt = prompt;
         this.userMessage = userMessage;
         //构造之后直接完成请求发送和处理
+    }
+    public OpenAIRequest(String userMessage) {
+        this.userMessage = userMessage;
     }
 
     private String sendRequest() {

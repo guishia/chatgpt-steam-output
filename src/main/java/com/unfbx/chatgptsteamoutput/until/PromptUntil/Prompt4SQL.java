@@ -1,4 +1,4 @@
-package com.unfbx.chatgptsteamoutput.until.promptUntil;
+package com.unfbx.chatgptsteamoutput.until.PromptUntil;
 
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ public class Prompt4SQL implements Prompt {
             "Pay attention to use only the column names you can see in the tables below. Be careful to not query for columns that do not exist. Also, pay attention to which column is in which table.\n\n" +
             "Use the following format:\n\n" +
             "Question: \"Question here\"\n" +
-            "SQLQuery: \"SQL Query to run\"\n" +
+            "SQLQuery:\"SQL Query to run\"\n" +
             "SQLResult: \"Result of the SQLQuery\"\n" +
             "Answer: \"Final answer here\"\n\n" +
             "Only use the following tables:\n" +
@@ -24,7 +24,6 @@ public class Prompt4SQL implements Prompt {
             "Question: ";
 
     public Prompt4SQL(int top_k, String tableInfo) {
-        this.top_k = top_k;
         this.tableInfo = tableInfo;
     }
 

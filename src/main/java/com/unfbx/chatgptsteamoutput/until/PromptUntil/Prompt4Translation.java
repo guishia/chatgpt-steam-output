@@ -1,4 +1,4 @@
-package com.unfbx.chatgptsteamoutput.until.promptUntil;
+package com.unfbx.chatgptsteamoutput.until.PromptUntil;
 
 import org.springframework.stereotype.Component;
 

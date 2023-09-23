@@ -6,20 +6,18 @@ import com.unfbx.chatgpt.exception.CommonError;
 import com.unfbx.chatgptsteamoutput.controller.request.ChatRequest;
 import com.unfbx.chatgptsteamoutput.controller.response.ChatResponse;
 import com.unfbx.chatgptsteamoutput.service.SseService;
-import com.unfbx.chatgptsteamoutput.until.promptUntil.Prompt;
-import com.unfbx.chatgptsteamoutput.until.promptUntil.Prompt4SQL;
-import com.unfbx.chatgptsteamoutput.until.promptUntil.Prompt4Translation;
-import com.unfbx.chatgptsteamoutput.until.promptUntil.SystemPrompt.Prompt4DataAsync;
+import com.unfbx.chatgptsteamoutput.until.PromptUntil.Prompt4SQL;
+import com.unfbx.chatgptsteamoutput.until.PromptUntil.Prompt4Translation;
+import com.unfbx.chatgptsteamoutput.until.RequestTypeUntil.RequestType;
+import com.unfbx.chatgptsteamoutput.until.RequestTypeUntil.RequestTypeEnum;
+import com.unfbx.chatgptsteamoutput.until.RequestTypeUntil.RequestTypeFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import com.unfbx.chatgptsteamoutput.until.openAIRequstUntil.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -32,7 +30,6 @@ import java.util.concurrent.*;
 @Controller
 @Slf4j
 public class ChatController {
-
     @Autowired
     private Prompt4SQL prompt4SQL;
 
@@ -73,17 +70,10 @@ public class ChatController {
     public ChatResponse sseChat(@RequestBody ChatRequest chatRequest, @RequestHeader Map<String, String> headers, HttpServletResponse response) throws ExecutionException, InterruptedException {
         String uid = getUid(headers);
         String userQuestion = chatRequest.getMsg();
-        //任务分为三步，1：生成SQL、数据查询 2：数据提取 3：文本回调
-        CompletableFuture<String> genSQLData = CompletableFuture.supplyAsync(() -> {
-            try {
-                OpenAIRequest openAIRequest = new OpenAIRequest(prompt4SQL.getPrompt(), userQuestion);
-                return openAIRequest.getResult(); //当它是在SQL中查询的数据
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        CompletableFuture<String> asyncResult = genSQLData.thenApply(result -> Prompt4DataAsync.getPrompt() + result);
-        chatRequest.setMsg(asyncResult.get() + "问题为" + userQuestion);
+        String requestQuestionType = "SQL"; //未来传入
+        RequestType requestType = RequestTypeFactory.getRequest(RequestTypeEnum.valueOf(requestQuestionType));
+        String chatGPTResult = requestType.getChatResult(userQuestion);
+        chatRequest.setMsg(chatGPTResult);
         sseService.sseChat(uid, chatRequest);
         return new ChatResponse();
     }
@@ -123,6 +113,4 @@ public class ChatController {
         }
         return uid;
     }
-
-
 }
